@@ -1,0 +1,173 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Default.master.cs" Inherits="_Default_Master" %>
+<%@ Register TagPrefix="UC" TagName="SearchFeatured" Src="~/includes/SearchFeatured.ascx" %>
+<%@ Register TagPrefix="UC" TagName="Newsletter" Src="~/includes/Newsletter.ascx" %>
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title><asp:Literal ID="litBrowserTitle" runat="server" /> - <asp:Literal ID="litSiteName" runat="server" /></title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+    <asp:Literal ID="Description" runat="server" />
+    <asp:Literal ID="Keywords" runat="server" />
+
+    <script src="/js/jquery-1.4.2.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    //<![CDATA[
+        $(document).ready(function () {
+            $('input[type=text][title!=""]').each(function () {
+                if ($.trim($(this).val()) == '') $(this).val($(this).attr('title'));
+                if ($(this).val() == $(this).attr('title')) $(this).addClass('gray');
+            }).focus(switchText).blur(switchText);
+
+            $('form').submit(function () {
+                $(this).find('input[type=text][title!=""]').each(function () {
+                    if ($(this).val() == $(this).attr('title')) $(this).val('');
+                });
+            });
+        });
+
+        function switchText() {
+            if ($(this).val() == $(this).attr('title'))
+                $(this).val('').removeClass('gray');
+            else if ($.trim($(this).val()) == '')
+                $(this).addClass('gray').val($(this).attr('title'));
+        }
+
+        function searchFocus(id) {
+            document.getElementById(id).style.backgroundColor = "#FFF";
+            document.getElementById(id).style.color = "#606060";
+            document.getElementById("searchbox").style.backgroundColor = "#FFF";
+        }
+
+        function searchBlur(id) {
+            document.getElementById(id).style.backgroundColor = "#F1F1F1";
+            document.getElementById(id).style.color = "#CCC";
+            document.getElementById("searchbox").style.backgroundColor = "#F1F1F1";
+        }
+    //]]>
+    </script>
+    
+    <asp:ContentPlaceHolder ID="cphHead" runat="server" />
+    
+    <link href="/sites/<%=GeneralFunctions.getSiteDirectory()%>/css/style.css" rel="stylesheet" type="text/css" />
+   <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,800,800italic,700italic' rel='stylesheet' type='text/css'>
+    <asp:Literal ID="litAnalytics" runat="server" />
+</head>
+<body id="body" runat="server">
+    <form id="aspnetForm" runat="server">
+    <cc1:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server" />
+    <div class="holder">
+        <div class="top">
+            <div class="up">
+                <div class="logo">
+                    <a href="/">
+                        <img src="/sites/<%=GeneralFunctions.getSiteDirectory()%>/images/logo.png" alt="" /> 
+                    </a>
+                </div>
+                <!--<div class="searchbox">
+                    <div id="searchbox">
+                        <asp:TextBox CssClass="field" title="Zoeken..." ID="txtSearch" runat="server" onfocus='searchFocus(this.id)' onblur='searchBlur(this.id)'/>
+                    </div>
+                    <asp:ImageButton ID="butSearch" runat="server" alt="" 
+                                     CssClass="button" OnClick="Search_Click"/>
+                </div>
+            </div>-->
+            <div class="menu">
+                <asp:Repeater ID="rptMenu" runat="server">
+                <ItemTemplate>
+                    <div class="item">
+                        <a href="/<%#Eval("pageURL")%>"><%#Eval("pageMenuTitle").ToString().ToLower()%></a>
+                    </div>
+                </ItemTemplate>
+                <SeparatorTemplate>
+                </SeparatorTemplate>
+                </asp:Repeater>  
+            </div>   
+        </div>
+            
+        <div class="feature-area">
+            <asp:Panel class="featured" ID="panFeatured" runat="server">
+                <div class="image">
+                    <asp:Image ID="imgListingPhoto" runat="server" Width="938"/>
+                </div>
+                <UC:SearchFeatured ID="ucSearchFeatured" runat="server" Visible="false"/>
+            </asp:Panel>               
+
+            <div class="banner">
+                <h1>De makelaar voor Noord-Holland</h1>
+            </div>
+        </div>
+        
+        <div class="conCenter">
+            <asp:ContentPlaceHolder id="cphContentCenter" runat="server" />
+        </div>
+        
+        <div class="conLeft">
+            <asp:ContentPlaceHolder id="cphContentLeft" runat="server" />
+        </div>
+        <div class="conRight">
+            <asp:ContentPlaceHolder id="cphContentRight" runat="server" />
+        </div>
+       
+        <div class="clear"></div>
+    </div>
+    </div>
+    
+    <div class="news">
+        <asp:ContentPlaceHolder id="cphNews" runat="server" /> 
+    </div>
+    </form>
+    
+    <div class="bottom">
+        <div class="home bg">
+            <div class="home content">
+                <div class="nieuw">
+                    <span class="title">NIEUW IN DE VERKOOP</span><br /><br />
+                    <asp:DataList RepeatColumns="2" RepeatDirection="Horizontal" ID="rptHouses" runat="server" ItemStyle-VerticalAlign="Top">
+                        <ItemTemplate>
+                            <a class="house" href="/woning/<%# Eval("ListingID") %>/omschrijving/<%# CommonFunctions.GetAddress(Convert.ToInt32(Eval("ListingID")),true) %>.aspx">    
+                                <img src="<%# CommonFunctions.GetPhotoURL(Convert.ToString(Eval("photoName")), Convert.ToString(Eval("photoURL")), "small").Replace("&", "&amp;") %>" alt="<%# CommonFunctions.GetAddress(Convert.ToInt32(Eval("ListingID")),false) %>"/>
+                                <%# CommonFunctions.sWord(Eval("ListingAddress").ToString() + " " + Eval("ListingAddressNumber").ToString(), 14)%><br />
+                                <%# CommonFunctions.sWord(Eval("cityName").ToString(), 14)%><br />
+                                &euro; <%# CommonFunctions.sWord(CommonFunctions.FormatNumber(Eval("listingPrice").ToString()), 11)%>,-
+                            </a>
+                        </ItemTemplate>
+                    </asp:DataList>
+                </div>
+                <div class="newsletter">
+                    <UC:Newsletter ID="Newsletter" runat="server" />
+                </div>
+                <a class="contact" href="/contact.aspx">
+                    <span class="title">NEEM CONTACT MET ONS OP</span>
+                    <img src="/sites/<%=GeneralFunctions.getSiteDirectory()%>/images/mail.png" alt="" style="float:right"/>
+                </a>
+                <div class="searchbox">
+                    <form name="Search" id="Search" action="/home" >
+                        <span class="title">ZOEKEN</span>
+                        <p>
+                            <%--<input type="text" class="field" value="Zoeken..." name="txtSearch" id="Text1" 
+                                   onfocus="SearchFocus(this)" onblur='SearchBlur(this, this.id)'/>--%>
+                            <input class="field" title="Zoeken..." id="footerSearch" name="txtSearch"/>
+                            <input type="image" src="/sites/<%=GeneralFunctions.getSiteDirectory()%>/images/butSearch.png" alt="Zoeken"/>
+                        </p>
+                    </form>
+                </div>
+                <div class="social">
+                    <a href="http://www.facebook.com/" target="_blank"><img src="/sites/<%=GeneralFunctions.getSiteDirectory()%>/images/facebook.png" alt="Facebook" /></a>
+                    <a href="http://www.linkedin.com/" target="_blank"><img src="/sites/<%=GeneralFunctions.getSiteDirectory()%>/images/linkedin.png" alt="LinkedIn" /></a>
+                    <a href="http://www.twitter.com/" target="_blank"><img src="/sites/<%=GeneralFunctions.getSiteDirectory()%>/images/twitter.png" alt="Twitter" /></a>
+                    <a href="http://www.youtube.com/" target="_blank"><img src="/sites/<%=GeneralFunctions.getSiteDirectory()%>/images/youtube.png" alt="YouTube" /></a>
+                </div>
+                <div class="clear"></div>
+            </div>
+    </div>
+    
+    <div class="footer">
+        <span class="fright">
+            <script src="http://www.hebbink.com/js/signature.js" type="text/javascript"></script>
+         </span>
+    </div>   
+</body>
+</html>
