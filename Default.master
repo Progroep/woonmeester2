@@ -115,9 +115,9 @@
     </div>
     </div>
     
-    <div class="news">
+   <!-- <div class="news">
         <asp:ContentPlaceHolder id="cphNews" runat="server" /> 
-    </div>
+    </div>-->
     </form>
     
     <div class="bottom">
